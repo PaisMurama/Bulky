@@ -1,0 +1,89 @@
+﻿@model Category
+
+<form  action="Edit" method="post">
+	<div class="border p-3 mt-4">
+		<div class="row pb-2">
+			<h2 class="text-primary"> Edit Category </h2>
+			<hr />
+		</div>
+
+		<input asp-for="Id" hidden />
+		
+
+		<div class="mb-3 row p-1">
+			<label asp-for="Name" class="p-0"></label>
+			<input asp-for="Name" class="form-control">
+			<span asp-validation-for="Name"class="text-danger"></span>
+		</div>
+
+		<div class="mb-3 row p-1">
+			<label asp-for="DisplayOrder" class="p-0"></label>
+			<input asp-for="DisplayOrder"  class="form-control">
+			<span asp-validation-for="DisplayOrder" class="text-danger"></span>
+		</div>
+
+
+		<div class="row">
+			<div class="col-6 col-md-3">
+				<button type="submit" class="btn btn-primary form-control" >Update</button>
+			</div>
+
+			<div class="col-6 col-md-3">
+
+				<a asp-controller="Category" asp-action="Index" class="btn btn-outline-secondary form-control">
+					Back to List
+				</a>
+			</div>
+
+		</div>
+
+	
+
+	</div>
+
+</form>
+
+
+
+@section Scripts{
+
+
+	@{
+		<partial name="_ValidationScriptsPartial" />
+	}
+
+	@*
+	Usamos isso se por ventura o nosso script renderizar primeiro antes carregar o toastr e o jquery por completo no DOM	
+	<script>
+		$(document).ready(function () {
+			toastr.success('Teste funcionando!');
+		});
+	</script>
+
+	1️⃣ @await Html.PartialAsync("_Notifications")
+	O que faz: Renderiza a Partial imediatamente no local chamado, carregando todo o conteúdo da Partial.
+	Uso típico: _Layout.cshtml para exibir notificações em todas as páginas automaticamente.
+	Vantagem: Global, funciona para todas as views sem precisar repetir nada.
+	Desvantagem: Nenhuma real nesse caso, é assíncrono e seguro.
+
+	2️⃣ <partial name="_Notifications" />
+	O que faz: Também renderiza a Partial, mas de forma síncrona.
+	Uso típico: Razor Views ou Razor Pages, quando não precisa de async.
+	Vantagem: Código mais limpo, tag-like.
+	Desvantagem: Menos flexível em grandes projetos, e não aceita await.
+
+
+	3️⃣ @section Scripts { <partial name="_Notifications" /> }
+	O que faz: Coloca a Partial dentro de uma seção que será renderizada apenas se a view chamar @RenderSection("Scripts").
+	Uso típico: Scripts específicos de cada view.
+	Vantagem: Mantém scripts organizados por view.
+	Desvantagem: Não é global — precisa repetir em cada view que quiser a Partial, perde o objetivo de centralizar notificações.
+
+
+
+
+	*@
+
+}
+
+
