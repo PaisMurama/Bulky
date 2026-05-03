@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bulky.Utility
+namespace BulkyBook.Utility
 {
     /*
      Essa classe é uma classe de utilidade (Utility) que pode ser usada para armazenar constantes, métodos auxiliares ou qualquer outra funcionalidade que seja amplamente utilizada em todo o projeto.
