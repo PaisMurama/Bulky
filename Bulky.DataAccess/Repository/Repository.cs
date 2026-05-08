@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BulkyBook.DataAccess.Repository.IRepository;
+﻿using BulkyBook.DataAccess.Repository.IRepository;
 using BulkyBookWeb.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace BulkyBook.DataAccess.Repository
 {
@@ -31,7 +27,7 @@ namespace BulkyBook.DataAccess.Repository
             return  query;
         }
 
-        public T GetT(System.Linq.Expressions.Expression<Func<T, bool>> filter)
+        public T GetT(Expression<Func<T, bool>> filter)
         {
             IQueryable<T>query = dbSet;
             query = query.Where(filter);

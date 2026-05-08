@@ -1,0 +1,146 @@
+﻿@model Product
+
+<div class="card shadow border-0 mt-4">
+
+	<div class="card-header bg-secondary bg-gradient ml-0 py-3">
+		<div class="row">
+			<div class="col-12 text-center">
+				<h2 class="text-primary"> Edit Product </h2>
+			</div>
+		</div>
+	</div>
+
+	<div class="card-body p-4">
+		<form action="Edit" method="post" class="row">
+			<div class="border p-3">
+
+
+				<input asp-for="Id" hidden />
+
+				<div class="form-floating py-2 col-12 ">
+					<input asp-for="Title" class="form-control border-0 shadow">
+					<label asp-for="Title" class="ms-2"></label>
+					<span asp-validation-for="Title" class="text-danger"></span>
+				</div>
+
+				<div class="form-floating py-2 col-12">
+					<input asp-for="Description" class="form-control border-0 shadow">
+					<label asp-for="Description" class="ms-2"></label>
+					<span asp-validation-for="Description" class="text-danger"></span>
+				</div>
+
+
+				<div class="form-floating py-2 col-12">
+					<input asp-for="ISBN" class="form-control border-0 shadow">
+					<label asp-for="ISBN" class="ms-2"></label>
+					<span asp-validation-for="ISBN" class="text-danger"></span>
+				</div>
+
+
+				<div class="form-floating py-2 col-12">
+					<input asp-for="Author"  class="form-control border-0 shadow">
+					<label asp-for="Author" class="ms-2"></label>
+					<span asp-validation-for="Author" class="text-danger"></span>
+				</div>
+
+
+				<div class="form-floating py-2 col-12">
+					<input asp-for="ListPrice"  class="form-control border-0 shadow">
+					<label asp-for="ListPrice" class="ms-2"></label>
+					<span asp-validation-for="ListPrice" class="text-danger"></span>
+				</div>
+
+
+				<div class="form-floating py-2 col-12">
+					<input asp-for="Price"  class="form-control border-0 shadow">
+					<label asp-for="Price" class="ms-2"></label>
+					<span asp-validation-for="Price" class="text-danger"></span>
+				</div>
+
+
+				<div class="form-floating py-2 col-12">
+					<input asp-for="Price50"  class="form-control border-0 shadow">
+					<label asp-for="Price50" class="ms-2"></label>
+					<span asp-validation-for="Price50" class="text-danger"></span>
+				</div>
+
+
+				<div class="form-floating py-2 col-12">
+					<input asp-for="Price100"  class="form-control border-0 shadow">
+					<label asp-for="Price100" class="ms-2"></label>
+					<span asp-validation-for="Price100" class="text-danger"></span>
+				</div>
+
+
+
+
+				<div class="row">
+					<div class="col-6 col-md-3">
+						<button type="submit" class="btn btn-primary form-control">Update</button>
+					</div>
+
+					<div class="col-6 col-md-3">
+
+						<a asp-controller="Category" asp-action="Index" class="btn btn-outline-secondary form-control">
+							Back to List
+						</a>
+					</div>
+
+				</div>
+
+
+
+			</div>
+
+		</form>
+	</div>
+
+
+</div>
+
+
+
+
+
+@section Scripts{
+
+
+	@{
+		<partial name="_ValidationScriptsPartial" />
+	}
+
+	@*
+	Usamos isso se por ventura o nosso script renderizar primeiro antes carregar o toastr e o jquery por completo no DOM	
+	<script>
+		$(document).ready(function () {
+			toastr.success('Teste funcionando!');
+		});
+	</script>
+
+	1️⃣ @await Html.PartialAsync("_Notifications")
+	O que faz: Renderiza a Partial imediatamente no local chamado, carregando todo o conteúdo da Partial.
+	Uso típico: _Layout.cshtml para exibir notificações em todas as páginas automaticamente.
+	Vantagem: Global, funciona para todas as views sem precisar repetir nada.
+	Desvantagem: Nenhuma real nesse caso, é assíncrono e seguro.
+
+	2️⃣ <partial name="_Notifications" />
+	O que faz: Também renderiza a Partial, mas de forma síncrona.
+	Uso típico: Razor Views ou Razor Pages, quando não precisa de async.
+	Vantagem: Código mais limpo, tag-like.
+	Desvantagem: Menos flexível em grandes projetos, e não aceita await.
+
+
+	3️⃣ @section Scripts { <partial name="_Notifications" /> }
+	O que faz: Coloca a Partial dentro de uma seção que será renderizada apenas se a view chamar @RenderSection("Scripts").
+	Uso típico: Scripts específicos de cada view.
+	Vantagem: Mantém scripts organizados por view.
+	Desvantagem: Não é global — precisa repetir em cada view que quiser a Partial, perde o objetivo de centralizar notificações.
+
+
+
+
+	*@
+
+}
+
+
