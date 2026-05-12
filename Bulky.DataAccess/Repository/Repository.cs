@@ -21,16 +21,35 @@ namespace BulkyBook.DataAccess.Repository
             dbSet.Add(entity);
         }
 
-        public IEnumerable<T> GetAll()
+        public IEnumerable<T> GetAll(string? includeProperties = null)
         {
             IQueryable<T> query = dbSet;
-            return  query;
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var property in includeProperties
+                    .Split(new char[]{','},StringSplitOptions.RemoveEmptyEntries))
+                { 
+                    query = query.Include(property);
+                }
+                    
+            }
+
+            return  query.ToList();
         }
 
-        public T GetT(Expression<Func<T, bool>> filter)
+        public T GetT(Expression<Func<T, bool>> filter, string? includeProperties = null)
         {
             IQueryable<T>query = dbSet;
             query = query.Where(filter);
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var property in includeProperties
+                    .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(property);
+                }
+
+            }
             return query.FirstOrDefault();
         }
 
