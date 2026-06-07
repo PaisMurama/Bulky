@@ -5,20 +5,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BulkyBookWeb.DataAccess.Data
 {
-    public class ApplicationDbContext:IdentityDbContext<IdentityUser>
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
-       public ApplicationDbContext(DbContextOptions<ApplicationDbContext>options):base(options) { }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
 
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Company> Companies { get; set; }
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Category>().HasData
             (
-                new Category { Id=1,Name="Action",DisplayOrder=1},
+                new Category { Id = 1, Name = "Action", DisplayOrder = 1 },
                 new Category { Id = 2, Name = "SciFi", DisplayOrder = 2 },
                 new Category { Id = 3, Name = "History", DisplayOrder = 3 }
 
@@ -52,7 +55,7 @@ namespace BulkyBookWeb.DataAccess.Data
                     Price50 = 25,
                     Price100 = 20,
                     CategoryId = 1,
-                    ImageUrl= ""
+                    ImageUrl = ""
 
                 },
                 new Product
@@ -116,6 +119,50 @@ namespace BulkyBookWeb.DataAccess.Data
 
 
             );
+
+            modelBuilder.Entity<Company>().HasData(
+                new Company
+                {
+                    Id = 1,
+                    Name = "Tech Solutions",
+                    StreetAdress = "Av. Julius Nyerere, 100",
+                    City = "Maputo",
+                    State = "Maputo",
+                    PostalCode = "1100",
+                    PhoneNumber = "+258840000001"
+                },
+                new Company
+                {
+                    Id = 2,
+                    Name = "Moz Logistics",
+                    StreetAdress = "Av. 25 de Setembro, 250",
+                    City = "Beira",
+                    State = "Sofala",
+                    PostalCode = "2100",
+                    PhoneNumber = "+258840000002"
+                },
+                new Company
+                {
+                    Id = 3,
+                    Name = "Green Energy Mozambique",
+                    StreetAdress = "Rua da Resistência, 45",
+                    City = "Nampula",
+                    State = "Nampula",
+                    PostalCode = "3100",
+                    PhoneNumber = "+258840000003"
+                },
+                new Company
+                {
+                    Id = 4,
+                    Name = "Digital Services Ltd",
+                    StreetAdress = "Av. Eduardo Mondlane, 78",
+                    City = "Matola",
+                    State = "Maputo",
+                    PostalCode = "1114",
+                    PhoneNumber = "+258840000004"
+                } 
+                
+             );
 
 
 

@@ -1,0 +1,138 @@
+﻿@model CompanyVM
+
+<div class="card shadow border-0 mt-4">
+	<div class="card-header bg-secondary bg-gradient ml-0 py-3">
+	<div class="row">
+		<div class="col-12 text-center">
+				<h2 class="text-primary"> @(Model.Company.Id!=0?"Update":"Create") Company </h2>
+		</div>
+	</div>
+
+	</div>
+
+	<div class="card-body p-4">
+	
+				<form action="Upsert" method="post" class="row" enctype="multipart/form-data">
+					<input asp-for="Company.Id" hidden />
+					@*<input asp-for="Product.ImageUrl" hidden/>*@
+					<div class="row">
+						<div class="col-12">
+
+
+							 <div class="border p-3">
+
+								@*<div asp-validation-summary="ModelOnly"></div>*@
+
+								<div class="form-floating py-2 col-12 ">
+									<input asp-for="Company.Name" class="form-control border-0 shadow">
+									<label asp-for="Company.Name" class="ms-2"></label>
+									<span asp-validation-for="Company.Name" class="text-danger"></span>
+								</div>
+
+								
+
+								<div class="form-floating py-2 col-12">
+									<input asp-for="Company.StreetAdress" class="form-control border-0 shadow">
+									<label asp-for="Company.StreetAdress" class="ms-2"></label>
+									<span asp-validation-for="Company.StreetAdress" class="text-danger"></span>
+								</div>
+
+
+								<div class="form-floating py-2 col-12">
+									<input asp-for="Company.City" class="form-control border-0 shadow">
+									<label asp-for="Company.City" class="ms-2"></label>
+									<span asp-validation-for="Company.City" class="text-danger"></span>
+								</div>
+
+
+								<div class="form-floating py-2 col-12">
+									<input asp-for="Company.State" class="form-control border-0 shadow">
+									<label asp-for="Company.State" class="ms-2"></label>
+									<span asp-validation-for="Company.State" class="text-danger"></span>
+								</div>
+
+
+								<div class="form-floating py-2 col-12">
+									<input asp-for="Company.PostalCode" class="form-control border-0 shadow">
+									<label asp-for="Company.PostalCode" class="ms-2"></label>
+									<span asp-validation-for="Company.PostalCode" class="text-danger"></span>
+								</div>
+
+								
+								<div class="form-floating py-2 col-12">
+									<input asp-for="Company.PhoneNumber" class="form-control border-0 shadow">
+									<label asp-for="Company.PhoneNumber" class="ms-2"></label>
+									<span asp-validation-for="Company.PhoneNumber" class="text-danger"></span>
+								</div>
+
+								<div class="row">
+									<div class="col-6 col-md-3">
+										@if (Model.Company.Id == 0)
+										{
+											<button type="submit" class="btn btn-primary form-control">Create</button>
+										}
+										else
+										{
+											<button type="submit" class="btn btn-primary form-control">Update</button>
+										}
+
+									</div>
+
+									<div class="col-6 col-md-3">
+
+										<a asp-controller="Company" asp-action="Index" class="btn btn-outline-secondary form-control">
+											Back to List
+										</a>
+									</div>
+
+								</div>
+
+
+				    	 	</div>
+
+				        </div>
+
+					</div>
+
+					
+
+				</form>
+			</div>
+		
+
+
+
+</div>
+
+
+@section Scripts{
+	<script>
+		tinymce.init({
+		  selector: 'textarea',
+		  plugins: [
+			// Core editing features
+			'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
+			// Your account includes a free trial of TinyMCE premium features
+			// Try the most popular premium features until May 24, 2026:
+			'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'advtemplate', 'tinymceai', 'uploadcare', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown','importword', 'exportword', 'exportpdf'
+		  ],
+		  toolbar: 'undo redo | tinymceai-chat tinymceai-quickactions tinymceai-review | blocks fontfamily fontsize | bold italic underline strikethrough | link media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography uploadcare | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+		  tinycomments_mode: 'embedded',
+		  tinycomments_author: 'Author name',
+		  mergetags_list: [
+			{ value: 'First.Name', title: 'First Name' },
+			{ value: 'Email', title: 'Email' },
+		  ],
+		  tinymceai_token_provider: async () => {
+			await fetch(`https://demo.api.tiny.cloud/1/219fyjyk3qtmeolvv390hfhmg08yiyb3yikbj2jytj4pcy7q/auth/random`, { method: "POST", credentials: "include" });
+			return { token: await fetch(`https://demo.api.tiny.cloud/1/219fyjyk3qtmeolvv390hfhmg08yiyb3yikbj2jytj4pcy7q/jwt/tinymceai`, { credentials: "include" }).then(r => r.text()) };
+		  },
+		  uploadcare_public_key: '61a5d3431c3f9f5a2cdf',
+		});
+	</script>
+
+	@{
+		<partial name="_ValidationScriptsPartial" />
+	}
+}
+

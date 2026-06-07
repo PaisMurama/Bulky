@@ -34,5 +34,10 @@
   <ItemGroup>
     <Folder Include="wwwroot\images\product\" />
   </ItemGroup>
+	
+
+  <ItemGroup>
+    <None Include="Areas\Admin\Controllers\CompanyController.cs" />
+  </ItemGroup>
 
 </Project>
