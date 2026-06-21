@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BulkyBook.Models.ViewModels
 {
-    public class CompanyVM
+    public class ProductVM
     {
-        public Company Company { get; set; }
+        public Product Product { get; set; }
 
+        [ValidateNever]
+        public IEnumerable<SelectListItem> CategoryList { get; set; }
     }
 }
