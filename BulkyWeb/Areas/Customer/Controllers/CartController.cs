@@ -1,9 +1,12 @@
-﻿using System.Security.Claims;
-using BulkyBook.DataAccess.Repository.IRepository;
+﻿using BulkyBook.DataAccess.Repository.IRepository;
 using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
+using BulkyBook.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
+using Stripe.Checkout;
+using System.Security.Claims;
 
 namespace BulkyBookWeb.Areas.Customer.Controllers
 {
@@ -12,6 +15,8 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
     public class CartController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+
+        [BindProperty]
         public ShoppingCartVM ShoppingCartVM { get; set; }
 
         public CartController(IUnitOfWork unitOfWork)
@@ -66,6 +71,105 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             }
             return View(ShoppingCartVM);
         
+        }
+
+        [HttpPost]
+        [ActionName("Summary")]
+        public IActionResult SummaryPost(ShoppingCartVM ShoppingCartVM)
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            ShoppingCartVM.ShoppingCartList = _unitOfWork.ShoppingCartRepository.GetAll(u => u.ApplicationUserId == userId, includeProperties: "Product");
+
+            ShoppingCartVM.OrderHeader.OrderDate = DateTime.Now;
+            ShoppingCartVM.OrderHeader.ApplicationUserId = userId;
+
+           ApplicationUser applicationUser = _unitOfWork.ApplicationUserRepository.GetT(u => u.Id == userId);
+
+
+            foreach (var cart in ShoppingCartVM.ShoppingCartList)
+            {
+                cart.Price = GetPriceBasedOnQuantity(cart);
+                ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
+            }
+
+            if (applicationUser.CompanyId.GetValueOrDefault() == 0)
+            {
+                // it is a regular customer account and we need to capture payment
+                ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusPending;
+                ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusPending;
+            }
+            else {
+
+                // it is company user
+                ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusApprovedForDelayedPayment;
+                ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusApproved;
+
+            }
+
+            _unitOfWork.OrderHeaderRepository.Add(ShoppingCartVM.OrderHeader);
+            _unitOfWork.Save();
+
+            foreach (var details in ShoppingCartVM.ShoppingCartList)
+            { 
+                OrderDetail orderDetail = new OrderDetail() 
+                { 
+                  ProductId = details.ProductId,
+                  OrderHeaderId = ShoppingCartVM.OrderHeader.Id,
+                  Price = details.Price,
+                  Count = details.Count
+                    
+                };
+                _unitOfWork.OrderDetailRepository.Add(orderDetail);
+                _unitOfWork.Save();
+            
+            }
+
+            if (applicationUser.CompanyId.GetValueOrDefault() == 0)
+            {
+                // it is a regular customer account and we need to capture payment
+                //  stripe logic
+                var domain = "https://localhost:7227/";
+                var options = new Stripe.Checkout.SessionCreateOptions
+                {
+                   SuccessUrl = domain+ $"customer/cart/OrderConfirmation?id={ShoppingCartVM.OrderHeader.Id}",
+                   CancelUrl = domain+"customer/cart/index",
+                    LineItems = new List<Stripe.Checkout.SessionLineItemOptions>(),
+                    Mode = "payment",
+                };
+                foreach (var item in ShoppingCartVM.ShoppingCartList)
+                {
+                    var sessionLineItem = new SessionLineItemOptions
+                    {
+                         PriceData = new SessionLineItemPriceDataOptions { 
+                         UnitAmount = (long)(item.Price*100),
+                         Currency = "usd",
+                         ProductData = new SessionLineItemPriceDataProductDataOptions 
+                         {
+                            Name = item.Product.Title
+                         }
+                        
+                        },
+                        Quantity = item.Count
+                    };
+                    options.LineItems.Add(sessionLineItem);
+                }
+
+                var service = new SessionService();
+                Session session  =  service.Create(options);
+
+
+            }
+
+
+           return RedirectToAction(nameof(OrderConfirmation), new { id = ShoppingCartVM.OrderHeader.Id });
+
+        }
+
+        public IActionResult OrderConfirmation(int id) 
+        {
+            return View(id);
         }
 
         public IActionResult Plus(int cartId)
