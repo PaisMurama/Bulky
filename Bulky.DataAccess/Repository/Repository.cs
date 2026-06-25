@@ -24,23 +24,24 @@ namespace BulkyBook.DataAccess.Repository
         public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter, string? includeProperties = null)
         {
             IQueryable<T> query = dbSet;
+
             if (filter != null)
             {
-                query.Where(filter);
+                query = query.Where(filter); // agora o filtro é aplicado corretamente
             }
-            
+
             if (!string.IsNullOrEmpty(includeProperties))
             {
                 foreach (var property in includeProperties
-                    .Split(new char[]{','},StringSplitOptions.RemoveEmptyEntries))
-                { 
+                    .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
                     query = query.Include(property);
                 }
-                    
             }
 
-            return  query.ToList();
+            return query.ToList();
         }
+
 
         public T GetT(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked =false)
         {
