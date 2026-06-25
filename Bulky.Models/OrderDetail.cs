@@ -13,7 +13,9 @@ namespace BulkyBook.Models
     {
         public int Id { get; set; }
 
+
         [Required]
+        // for the order header, we will use the OrderHeader class from the OrderHeader model
         public int OrderHeaderId { get; set; }
 
         [ForeignKey("OrderHeaderId")]
@@ -27,8 +29,10 @@ namespace BulkyBook.Models
         [ValidateNever]
         public Product Product { get; set; }
 
+        // for count, we will use the following values: 1, 2, 3, etc.
         public int Count { get; set; }
 
+        // for price, we will use the following values: 0.00, 10.00, 20.00, etc.
         public double Price { get; set; }
 
 
