@@ -4,9 +4,11 @@ using BulkyBook.Models.ViewModels;
 using BulkyBook.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Stripe;
 using Stripe.Checkout;
 using System.Security.Claims;
+using System.Linq;
 
 namespace BulkyBookWeb.Areas.Customer.Controllers
 {
@@ -103,7 +105,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             else {
 
                 // it is company user
-                ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusApprovedForDelayedPayment;
+                ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusDelayedPayment;
                 ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusApproved;
 
             }
@@ -130,7 +132,9 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             {
                 // it is a regular customer account and we need to capture payment
                 //  stripe logic
-                var domain = "https://localhost:7227/";
+                //Evitar deixar a porta fixa na app pois podem haver cenarios que a porta app muda....e
+                //var domain = "https://localhost:7227/";
+                var domain = $"{Request.Scheme}://{Request.Host}/";
                 var options = new Stripe.Checkout.SessionCreateOptions
                 {
                    SuccessUrl = domain+ $"customer/cart/OrderConfirmation?id={ShoppingCartVM.OrderHeader.Id}",
@@ -171,6 +175,39 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
 
         public IActionResult OrderConfirmation(int id) 
         {
+            OrderHeader orderHeader = _unitOfWork.OrderHeaderRepository.GetT(u=>u.Id == id,includeProperties: "ApplicationUser");
+            
+            if (orderHeader.PaymentStatus != SD.PaymentStatusDelayedPayment)
+            {
+                // this is an order customer
+                var service = new SessionService();
+                Session session = service.Get(orderHeader.SessionId);
+
+                Console.WriteLine($"PaymentStatus: {session.PaymentStatus}");
+                Console.WriteLine($"PaymentIntentId: {session.PaymentIntentId}");
+                Console.WriteLine($"SessionId: {session.Id}");
+
+                if (session.PaymentStatus.ToLower()=="paid")
+                {
+                    _unitOfWork.OrderHeaderRepository.UpdateStripePaymentID(id, session.Id, session.PaymentIntentId);
+                    _unitOfWork.OrderHeaderRepository.UpdateStatus(id,SD.StatusApproved,SD.PaymentStatusApproved);
+                    _unitOfWork.Save();
+                }
+
+                List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCartRepository
+                    .GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId).ToList();
+
+                _unitOfWork.ShoppingCartRepository.RemoveRange(shoppingCarts);
+
+
+
+
+            }
+            
+
+
+
+
             return View(id);
         }
 
